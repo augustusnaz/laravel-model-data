@@ -23,8 +23,8 @@ trait HasData
     public function setDataAttribute($data)
     {
         $model_data = $this->modeldata()->firstOrCreate([
-            'datable_id' => $this->id,
-            'datable_type' => get_class($this),
+            'datable_id' => $this->getKey(),
+            'datable_type' => $this->getMorphClass(),
         ]);
         $model_data->update(['data' => $data]);
 
@@ -37,8 +37,8 @@ trait HasData
          * Ensure the object exists
          */
         $this->modeldata()->firstOrCreate([
-            'datable_id' => $this->id,
-            'datable_type' => get_class($this),
+            'datable_id' => $this->getKey(),
+            'datable_type' => $this->getMorphClass(),
         ]);
 
         return Data::create($this, 'data');
@@ -53,8 +53,8 @@ trait HasData
     public function data($key = null, $value = null){
 
         $model_data = $this->modeldata()->firstOrCreate([
-            'datable_id' => $this->id,
-            'datable_type' => get_class($this),
+            'datable_id' => $this->getKey(),
+            'datable_type' => $this->getMorphClass(),
         ]);
 
         $data = $model_data->data?? [];

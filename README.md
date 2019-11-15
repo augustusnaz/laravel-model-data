@@ -1,6 +1,6 @@
 # Add extra (data) attributes to Eloquent models
 
-Have you wished your model could easily add and remote attributes without messing up your migrations? This package provides an easy way to access extra attribute (data) to you eloquent without any changes to your migrations or model codes.
+Have you wished your model could easily add and remove attributes without messing up your migrations? This package provides an easy way to access extra attribute (data) to you eloquent without any changes to your migrations or model codes.
 
 
 
@@ -89,7 +89,7 @@ $model->data = [
    'samsung' => ['resource' => 'white'],
 ];
 $model->data->set('moirei.tech', 'awesome');
-$model->data->get('moirei.tech'); // Returns 'awesome
+$model->data->get('moirei.tech'); // Returns 'awesome'
 ```
 
 You can also pass a default value to the `get` method.
@@ -117,6 +117,16 @@ $model->data('name', 'value');
 ```
 
 also calls the `save` method.
+
+
+
+## Design Notes
+
+- This package is not recommended for data-heavy models and application query
+
+
+
+
 
 ## Credits
 
