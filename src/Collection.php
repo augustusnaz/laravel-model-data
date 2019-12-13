@@ -117,10 +117,12 @@ class Collection extends \Illuminate\Support\Collection{
     private function getModelData(): array
     {
         if( $this->use_local ){
-            return json_decode($this->model->getOriginal( $this->attribute_name ), true);
+            $data = $this->model->getOriginal( $this->attribute_name );
         }else{
-            return json_decode($this->model->modeldata->getOriginal( $this->attribute_name ), true);
+            $data = $this->model->modeldata->getOriginal( $this->attribute_name );
         }
+
+        return json_decode($data, true)?? [];
     }
 
     private function override(iterable $items)
