@@ -221,12 +221,12 @@ The `pinch` function simply allows you to access a collection's underlying array
 ### Retrieving models with Query Builder
 
 ```php
-$model = YourModel::withData('first_name', 'James')->get();
+$model = YourModel::withData('first_name', 'James')->first();
 
 $model = YourModel::withData([
     'first_name' => 'James',
     'last_name' => 'Franco',
-])->get();
+])->first();
 ```
 
 Use wisely. Since the data column is a not a JSON, the internal query uses `LIKE` notation to match the *stringified* data against the column data.
