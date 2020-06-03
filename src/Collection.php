@@ -107,7 +107,7 @@ class Collection extends \Illuminate\Support\Collection{
         return $this->override($this->items);
     }
 
-    public function push($value)
+    public function push(...$value)
     {
         parent::push($value);
 
@@ -120,7 +120,11 @@ class Collection extends \Illuminate\Support\Collection{
             $data = $this->model->getOriginal( $this->attribute_name );
         }else{
             $data = $this->model->modeldata->getOriginal( $this->attribute_name );
-        }
+		}
+
+		if(is_array($data)){
+			return $data;
+		}
 
         return json_decode($data, true)?? [];
     }
