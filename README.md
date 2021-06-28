@@ -1,21 +1,16 @@
-# Add extra (data) attributes to Eloquent models
+# laravel-model-data
 
-Have you wished your model could easily add and remove attributes without messing up your migrations? This package provides an easy way to access extra attribute (data) to you eloquent without any changes to your migrations or model codes.
-
-
+This package allows you to access attribute fields in your model or else use a **data** field without any changes to your migrations.
 
 ### Features
 
-* Use extra data on eloquent model without defining a new column
-* Option to use model's column instead of the package's global `model_data` table
-* Handles and return data as `collection`
-* `collect` any data and save into any model with the `HasData` trait
+- Use extra data on eloquent model without defining a new column
+- Easily interact with multiple custom fields on your model as data fields
+- `collect` any data and save into any model with the `HasData` trait
 
 
 
 ## Installation & Setup
-
-The package can be set up in two modes: (1) persist data with the internal model or (2) define a column on your model. A combination of both can also be used with different models.
 
 You can install the package via composer;
 
@@ -23,17 +18,7 @@ You can install the package via composer;
 composer require moirei/laravel-model-data
 ```
 
-First you must install the service provider (skip for Laravel>=5.5);
-
-```php
-// config/app.php
-'providers' => [
-    ...
-    MOIREI\ModelData\ModelDataServiceProvider::class,
-],
-```
-
-Add the `MOIREI\ModelData\HasData` trait to your  model;
+Add the `MOIREI\ModelData\HasData` trait to your model;
 
 ```php
 use MOIREI\ModelData\HasData;
@@ -41,19 +26,19 @@ use MOIREI\ModelData\HasData;
 class YourModel extends Model
 {
     use HasData;
-    
+
     ...
 }
 ```
 
 #### Using the package's model
 
-**Optional if using a predefined attribute/column in your models.**
+*Optional if using a predefined attribute/column in your models.*
 
 Publish the migration with;
 
 ```bash
-php artisan vendor:publish --provider="MOIREI\ModelData\ModelDataServiceProvider" --tag="migrations"
+php artisan vendor:publish --tag="model-data-migrations"
 ```
 
 Run the migrate command to create the necessary table;
@@ -64,54 +49,40 @@ php artisan migrate
 
 
 
-#### Using a model attribute/column
+### Mode 1: Persist data outside your model
 
-Define the data column in your migration;
+This is the default mode if the `$model_data` property is falsy.
+
+### Mode 2: Persist data in your model
+
+Define the data column (s) in your migration;
 
 ```php
-Schema::create('model_table', function (Blueprint $table) {
+Schema::create('products', function (Blueprint $table) {
     $table->modelData('data');
+    // OR
+    $table->json('data')->nullable();
     // OR
     $table->text('data')->nullable();
 });
 ```
 
-Then define a public `model_data` variable in your model;
+Then define a public `model_data` variable in your model. This is the name of the storage column.
 
 ```php
 ...
-    
+
 /**
   * ModelData: use model's column
   *
-  * @var string|false
+  * @var string|array|false
   */
-public $model_data = 'data';
+protected $model_data = 'data';
 
 class YourModel extends Model
 {
     use HasData;
-    
-    ...
-}
-```
 
-Don't forget to cast the attribute to array;
-
-```php
-class YourModel extends Model
-{
-    ...
-    
-    /**
-     * Arrays that should be casted
-     *
-     * @var array
-     */
-    protected $casts = [
-        'data' => 'array',
-    ];
-    
     ...
 }
 ```
@@ -121,6 +92,8 @@ class YourModel extends Model
 ## Usage
 
 ### Accessing the data
+
+The access below uses *`data`* if in *mode 1* or the of `$model_data` is `data`;
 
 Basic access:
 
@@ -136,7 +109,7 @@ $model->data['name'] = 'value';
 $model->data['name']; // Returns 'value'
 ```
 
-Using the`data` method (most recommended);
+Calling as function. 
 
 ```php
 $model->data('name', 'value');
@@ -154,13 +127,19 @@ $model->data = ['name' => 'value'];
 $model->data->all(); // Returns ['name' => 'value']
 ```
 
-With `get` and `set`; 
+With `get` and `set`;
 
 ```php
 $model->data = [
    'moirei' => ['tech' => 'awesome'],
    'mg001' => ['resource' => 'white'],
 ];
+// or
+$mdeol->data->set([
+   'moirei' => ['tech' => 'awesome'],
+   'mg001' => ['resource' => 'white'],
+]);
+
 $model->data->set('mg001.name', 'Wireless Power Bank');
 $model->data->get('mg001.name'); // Returns 'Wireless Power Bank'
 ```
@@ -168,10 +147,42 @@ $model->data->get('mg001.name'); // Returns 'Wireless Power Bank'
 `get` with default:
 
 ```php
-$model->data->get('unset_attribute', 'default'); // Returns 'default'
+$model->data->get('undefined-attribute', 'default'); // Returns 'default'
 ```
 
-**Note**: accessing `$model->data` returns a collection. `$model->data()` on the other hand is a function.
+
+
+### Multiple/custom data fields (mode 2)
+
+The above example uses `data` field which is the default for external mode. To allow multiple access with custom names,
+
+```php
+...
+
+/**
+  * ModelData: use model's column
+  *
+  * @var string|array|false
+  */
+// protected $model_data = 'settings';
+protected $model_data = [
+    'settings', 'meta', 
+];
+
+...
+```
+
+Access with
+
+```php
+// set values
+$model->settings->set([]);
+$model->meta->set([]);
+
+// get values
+dump($model->settings());
+dump($model->meta());
+```
 
 
 
@@ -179,31 +190,21 @@ $model->data->get('unset_attribute', 'default'); // Returns 'default'
 
 ```php
 $model->save();
-```
-
-Or
-
-```php
+// or
 $model->data->save();
 ```
-
-which only saves data but does not affect your model (if using the package's ModelData). 
 
 Modify and save into a different model with
 
 ```php
-$model->data
-    ->filter()
-    ->save($model_2);
+$model->data->filter()->save($model_2, $key = 'data');
 ```
 
 
 
 ### Collections
 
-This packages extends and uses Laravel collections in many ways.
-
-Some extended functions are `put`, `forget`, `push`, `offsetSet`. Functions `pinch` and `save` are supplied globally.
+This packages supplies Collections functions `pinch` and `save`  globally.
 
 This means you can collect and save any data into any model that has the `HasData` trait;
 
@@ -211,50 +212,18 @@ This means you can collect and save any data into any model that has the `HasDat
 $data = collect([
     'first_name' => 'James',
     'last_name' => 'Franco'
-])->save($model);
+])->save($model, $key = 'data');
 ```
 
 The `pinch` function simply allows you to access a collection's underlying array using the dot notation.
 
+The `key` option defaults to `data`. 
 
 
-### Retrieving models with Query Builder
-
-```php
-$model = YourModel::withData('first_name', 'James')->first();
-
-$model = YourModel::withData([
-    'first_name' => 'James',
-    'last_name' => 'Franco',
-])->first();
-```
-
-Use wisely. Since the data column is a not a JSON, the internal query uses `LIKE` notation to match the *stringified* data against the column data.
-
-
-
-## Design Notes
-
-- Accessing the data with `$model->data` and `$model->data()` creates a new collection instance on every call.
-
-- If not using the extended collection functions (e.g. `put`, `forget`, `push`) to modify the underlying array, persist your data by using a single instance like
-
-  ```php
-  $data = $model->data; // return the created collection instance
-  $data->set('name', 'James')
-       ->filter()
-       ->save();
-  ```
-
-- Removing or setting `$model_data` to `false` in your model forces the package to use its internal model to persist data.
-
-  
 
 ## Credits
 
 - [Augustus Okoye](https://github.com/augustusnaz)
-
-
 
 ## License
 

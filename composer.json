@@ -1,13 +1,15 @@
 {
     "name": "moirei/laravel-model-data",
-    "description": "Add extra (data) attributes to Eloquent models",
+    "description": "Easily handle data fields in your Eloquent models",
     "keywords": [
         "moirei",
-        "laravel-model-data",
         "laravel",
+        "model",
+        "meta",
+        "data",
+        "eloquent",
         "extra data",
-        "model data",
-        "moirei.com"
+        "model data"
     ],
     "homepage": "https://github.com/augustusnaz/laravel-model-data",
     "license": "MIT",

@@ -25,6 +25,13 @@ class ModelData extends Model
     ];
 
     /**
+     * The connection table
+     *
+     * @var string
+     */
+    protected $table = 'models_data';
+
+    /**
      * Get all of the models that own push_subscription.
      */
     public function datable()

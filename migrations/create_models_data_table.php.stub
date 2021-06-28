@@ -20,7 +20,6 @@ class CreateModelsDataTable extends Migration
 
             $table->longText('data')->nullable();
             $table->timestamps();
-
         });
     }
 

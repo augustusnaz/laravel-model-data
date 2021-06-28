@@ -13,30 +13,22 @@ class ModelDataServiceProvider extends ServiceProvider
     public function register()
     {
         Blueprint::macro('modelData', function (string $column_name = 'data') {
-            return $this->text($column_name)->nullable();
+            return $this->json($column_name)->nullable();
         });
 
         Collection::macro('pinch', function ($key, $default = null) {
             $data = $this->all();
-            return Arr::has($data, $key)? Arr::get($data, $key) : $default;
+            return Arr::has($data, $key) ? Arr::get($data, $key) : $default;
         });
 
-        Collection::macro('save', function ($model = null) {
-            if($model instanceof Model){
-
-                $use_local = !empty($model->model_data);
-                $attribute_name = $use_local? $model->model_data : 'data';
-
-                if($use_local){
-                    $model->update([$attribute_name => $this->all()]);
-                }else{
-                    $model->modeldata->update([$attribute_name => $this->all()]);
-                }
+        Collection::macro('save', function ($model = null, $key = 'data') {
+            if ($model instanceof Model) {
+                $model->$key = $this->all();
+                $model->save();
             }
 
             return $this;
         });
-
     }
 
     /**
@@ -48,14 +40,13 @@ class ModelDataServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
 
-            if (! class_exists('CreateModelsDataTable')) {
+            if (!class_exists('CreateModelsDataTable')) {
                 $timestamp = date('Y_m_d_His', time());
 
                 $this->publishes([
-                    __DIR__.'/../migrations/create_models_data_table.php.stub' => $this->app->databasePath().'/migrations/'.$timestamp.'_create_models_data_table.php',
-                ], 'migrations');
+                    __DIR__ . '/../migrations/create_models_data_table.php.stub' => $this->app->databasePath() . '/migrations/' . $timestamp . '_create_models_data_table.php',
+                ], 'model-data-migrations');
             }
-
         }
     }
 }
