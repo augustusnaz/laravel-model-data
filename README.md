@@ -1,6 +1,6 @@
 # laravel-model-data
 
-This package allows you to access attribute fields in your model or else use a **data** field without any changes to your migrations.
+This package allows you to access attribute fields in your model or use a **data** field without any changes to your migrations.
 
 ### Features
 
@@ -67,7 +67,7 @@ Schema::create('products', function (Blueprint $table) {
 });
 ```
 
-Then define a public `model_data` variable in your model. This is the name of the storage column.
+Then define a `model_data` variable in your model. This is the name of the storage column(s).
 
 ```php
 ...
@@ -93,7 +93,7 @@ class YourModel extends Model
 
 ### Accessing the data
 
-The access below uses *`data`* if in *mode 1* or the of `$model_data` is `data`;
+The below uses *`data`* if in *mode 1* or the value of `$model_data` is `"data"`;
 
 Basic access:
 
@@ -109,7 +109,7 @@ $model->data['name'] = 'value';
 $model->data['name']; // Returns 'value'
 ```
 
-Calling as function. 
+Calling as function.
 
 ```php
 $model->data('name', 'value');
@@ -166,7 +166,7 @@ The above example uses `data` field which is the default for external mode. To a
   */
 // protected $model_data = 'settings';
 protected $model_data = [
-    'settings', 'meta', 
+    'settings', 'meta',
 ];
 
 ...
@@ -217,7 +217,7 @@ $data = collect([
 
 The `pinch` function simply allows you to access a collection's underlying array using the dot notation.
 
-The `key` option defaults to `data`. 
+The `key` option defaults to `data`.
 
 
 

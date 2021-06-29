@@ -121,11 +121,12 @@ trait HasData
     /**
      * Get the storage attribute name
      *
-     * @return string
+     * @return array
      */
-    public function getDataAttributeName(): string
+    public function getDataAttributeNames(): array
     {
-        return isset($this->model_data) && is_string($this->model_data) ? $this->model_data : 'data';
+        if (!isset($this->model_data)) return ['data'];
+        return is_array($this->model_data) ? $this->model_data : [$this->model_data];
     }
 
     /**
@@ -178,14 +179,34 @@ trait HasData
     }
 
     /**
+     * Fill the model with an array of attributes.
+     *
+     * @param  array  $attributes
+     * @return $this
+     *
+     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     */
+    public function fill(array $attributes)
+    {
+        $dataAttributes = $this->getDataAttributeNames();
+
+        foreach ($this->fillableFromArray($attributes) as $key => $value) {
+            if ($this->isFillable($key) && in_array($key, $dataAttributes)) {
+                $this->$key = $value;
+                unset($attributes[$key]);
+            }
+        }
+
+        return parent::fill($attributes);
+    }
+
+    /**
      * The "booting" method of the model.
      *
      * @return void
      */
-    protected static function boot()
+    protected static function bootHasData()
     {
-        parent::boot();
-
         static::creating(function (Model $model) {
             foreach ($model->modelDataCollection as $name => $modelDataCollection) {
                 if ($model->isLocalModelData($name)) {
