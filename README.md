@@ -135,7 +135,12 @@ $model->data = [
    'mg001' => ['resource' => 'white'],
 ];
 // or
-$mdeol->data->set([
+$model->data->set([
+   'moirei' => ['tech' => 'awesome'],
+   'mg001' => ['resource' => 'white'],
+]);
+// or
+$model = $model->data([
    'moirei' => ['tech' => 'awesome'],
    'mg001' => ['resource' => 'white'],
 ]);

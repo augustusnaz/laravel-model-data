@@ -84,8 +84,17 @@ trait HasData
         }
 
         $data = $this->$method;
-        $key = data_get($parameters, 0);
-        $value = data_get($parameters, 1);
+        $key = Arr::get($parameters, 0);
+        if ($is_array = is_array($key)) {
+            $value = $key;
+        } else {
+            $value = Arr::get($parameters, 1);
+        }
+
+        if ($is_array) {
+            $data->set($value);
+            return $this;
+        }
 
         if ($value) {
             $data->set($key, $value);
